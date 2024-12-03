@@ -10,6 +10,7 @@ import { useAppSelector } from "@/hooks/hooks";
 import { useToast } from "@/hooks/use-toast";
 import { useConfetti } from "@/hooks/useConfetti";
 import { verifySchema } from "@/schema/authSchema";
+import Title from "@/shared/Title";
 import { ApiError, ApiResponse } from "@/types/responses";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios, { AxiosError } from "axios";
@@ -74,55 +75,65 @@ const Verify = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen">
-      <div className="w-full max-w-xl p-8 space-y-8 rounded-xl border ">
-        <div className="text-center">
-          <h1 className="text-3xl font-extrabold tracking-tight lg:text-4xl mb-6">
-            Welcome to FlowMaker
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            {" "}
-            Hey {name}, to complete your registration please enter the code sent
-            to {email}
-          </p>
-        </div>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 ">
-            <FormField
-              control={form.control}
-              name="otp"
-              render={({ field }) => (
-                <InputOTP maxLength={6} pattern={REGEXP_ONLY_DIGITS} {...field}>
-                  <InputOTPGroup>
-                    <InputOTPSlot index={0} />
-                    <InputOTPSlot index={1} />
-                    <InputOTPSlot index={2} />
-                    <InputOTPSlot index={3} />
-                    <InputOTPSlot index={4} />
-                    <InputOTPSlot index={5} />
-                  </InputOTPGroup>
-                </InputOTP>
-              )}
-            />
-            <div className="flex flex-row justify-center">
-              <Button
-                type="submit"
-                disabled={isLoading}
-                className="mx-auto px-4 py-2 flex flex-row items-center justify-center gap-1 text-lg"
-              >
-                {isLoading ? (
-                  <>
-                    <Loader2 className="animate-spin h-4 w-4" /> Verifying
-                  </>
-                ) : (
-                  "Verify"
+    <>
+      <Title
+        title="Verify Email"
+        description="Complete your registration by entering the code sent to your email"
+      />
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="w-full max-w-xl p-8 space-y-8 rounded-xl border ">
+          <div className="text-center">
+            <h1 className="text-3xl font-extrabold tracking-tight lg:text-4xl mb-6">
+              Welcome to FlowMaker
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              {" "}
+              Hey {name}, to complete your registration please enter the code
+              sent to {email}
+            </p>
+          </div>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 ">
+              <FormField
+                control={form.control}
+                name="otp"
+                render={({ field }) => (
+                  <InputOTP
+                    maxLength={6}
+                    pattern={REGEXP_ONLY_DIGITS}
+                    {...field}
+                  >
+                    <InputOTPGroup>
+                      <InputOTPSlot index={0} />
+                      <InputOTPSlot index={1} />
+                      <InputOTPSlot index={2} />
+                      <InputOTPSlot index={3} />
+                      <InputOTPSlot index={4} />
+                      <InputOTPSlot index={5} />
+                    </InputOTPGroup>
+                  </InputOTP>
                 )}
-              </Button>
-            </div>
-          </form>
-        </Form>
+              />
+              <div className="flex flex-row justify-center">
+                <Button
+                  type="submit"
+                  disabled={isLoading}
+                  className="mx-auto px-4 py-2 flex flex-row items-center justify-center gap-1 text-lg"
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="animate-spin h-4 w-4" /> Verifying
+                    </>
+                  ) : (
+                    "Verify"
+                  )}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

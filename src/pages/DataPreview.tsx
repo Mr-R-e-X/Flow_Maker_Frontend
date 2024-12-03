@@ -150,6 +150,9 @@ const DataPreview = () => {
 
 const MemoizedDataPreview = memo(DataPreview);
 
-const DataPreviewPage = Layout(MemoizedDataPreview);
+const DataPreviewPage = Layout(MemoizedDataPreview, {
+  title: "Data Preview",
+  description: "Preview your uploaded csv data",
+});
 
 export default DataPreviewPage;

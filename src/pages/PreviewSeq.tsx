@@ -174,4 +174,9 @@ const PreviewSeq: React.FC = () => {
   );
 };
 
-export default Layout(PreviewSeq);
+const PreviewSeqPage = Layout(PreviewSeq, {
+  title: "Preview Sequence",
+  description: "Preview your sequence",
+});
+
+export default PreviewSeqPage;

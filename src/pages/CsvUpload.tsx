@@ -156,6 +156,9 @@ const CsvUpload: React.FC = () => {
   );
 };
 
-const CSVpage = Layout(CsvUpload);
+const CSVpage = Layout(CsvUpload, {
+  title: "CSV Upload",
+  description: "Upload a CSV file to create a new lead list",
+});
 
 export default CSVpage;

@@ -258,5 +258,8 @@ const FlowChart = () => {
   );
 };
 
-const FlowChartPage = Layout(FlowChart);
+const FlowChartPage = Layout(FlowChart, {
+  title: "Flowchart",
+  description: "Create your flowchart",
+});
 export default FlowChartPage;

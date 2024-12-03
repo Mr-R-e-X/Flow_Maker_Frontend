@@ -271,6 +271,10 @@ export function Home() {
   );
 }
 
-const HomePage = Layout(Home);
+const HomePage = Layout(Home, {
+  title: "Home",
+  description:
+    "Create/Manage your sequences with automated emails & timely tasks.",
+});
 
 export default HomePage;

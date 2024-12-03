@@ -226,6 +226,9 @@ const TemplateEditor = () => {
   );
 };
 
-const TemplateEditorPage = Layout(TemplateEditor);
+const TemplateEditorPage = Layout(TemplateEditor, {
+  title: "Template Editor",
+  description: "Create/Edit email template to add it to Sequences.",
+});
 
 export default TemplateEditorPage;
