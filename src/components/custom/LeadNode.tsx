@@ -25,7 +25,6 @@ const LeadNode = ({
 
   const handleEditLeadSource = async () => {
     const value = await handleLeadSourceAlert(leadSourceList);
-    console.log(value);
     if (value) {
       setSelectedOptions(value.element);
       setNodes((prevNodes) =>

@@ -18,15 +18,12 @@ import {
   checkAllNodeValid,
   createNodeandEdgeIdList,
   handleSaveSequence,
-  promptEditSequenceName,
-  promptSequenceName,
 } from "@/lib/flowUtils";
 import {
   addNodes,
   CustomNode,
   onEdgesChange,
   onNodesChange,
-  setName,
 } from "@/store/slices/flowChartSlice";
 import { ApiError, ApiResponse } from "@/types/responses";
 import {
@@ -39,8 +36,8 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import axios, { AxiosError } from "axios";
-import { Edit, LoaderPinwheel } from "lucide-react";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { LoaderPinwheel } from "lucide-react";
+import { useCallback, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { v4 as uuid } from "uuid";
 
@@ -54,22 +51,12 @@ const edgeTypes = {
 };
 
 const FlowChart = () => {
-  const { nodes, edges, name } = useAppSelector((state) => state.flow);
+  const { nodes, edges } = useAppSelector((state) => state.flow);
   const dispatch = useAppDispatch();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { toast } = useToast();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!name) {
-      const setInitialName = async () => {
-        const result = await promptSequenceName();
-        dispatch(setName(result?.value));
-      };
-      setInitialName();
-    }
-  }, [dispatch, name]);
 
   const dragOutSideRef = useRef<
     (typeof NodeType)[keyof typeof NodeType] | null
@@ -123,10 +110,10 @@ const FlowChart = () => {
     [screenToFlowPosition, dispatch]
   );
 
-  const handleEditClick = async () => {
-    const res = await promptEditSequenceName(name);
-    dispatch(setName(res?.value));
-  };
+  // const handleEditClick = async () => {
+  //   const res = await promptEditSequenceName(name);
+  //   dispatch(setName(res?.value));
+  // };
 
   const handleSaveClick = async () => {
     const allNodeValid = checkAllNodeValid(nodes);
@@ -139,13 +126,10 @@ const FlowChart = () => {
       );
       return;
     }
-    const data = await handleSaveSequence(name);
-
-    console.log(data.name);
-    console.log(data.description);
+    const data = await handleSaveSequence();
 
     if (!data) return;
-    console.log(nodes);
+
     try {
       setIsLoading(true);
       const [createNodesRes, createEdgeRes] = await Promise.all([
@@ -226,7 +210,7 @@ const FlowChart = () => {
             color: "white",
           }}
         >
-          <div className="flex items-center gap-2 font-bold">
+          {/* <div className="flex items-center gap-2 font-bold">
             <input
               type="text"
               value={name}
@@ -234,7 +218,7 @@ const FlowChart = () => {
               className="text-center text-xl bg-transparent border-none outline-none w-max overflow-x-auto text-white"
             />
             <Edit className="cursor-pointer" onClick={handleEditClick} />
-          </div>
+          </div> */}
           <NodeSidebar onDragStart={onDragStart} />
           <Button
             variant={"secondary"}

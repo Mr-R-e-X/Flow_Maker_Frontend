@@ -13,7 +13,6 @@ import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 import { useToast } from "@/hooks/use-toast";
 import { logout } from "@/store/slices/authSlice";
 import { ApiError, ApiResponse } from "@/types/responses";
-
 import { Popover, PopoverTrigger } from "@radix-ui/react-popover";
 import axios, { AxiosError } from "axios";
 
@@ -37,11 +36,6 @@ const Header = () => {
   const dispatch = useAppDispatch();
 
   const handleRedirect = (urlStr: string) => {
-    // if (urlStr === "flowchart") {
-    //   dispatch(resetFlowList());
-    //   dispatch(resetEdges());
-    //   dispatch(resetNodes());
-    // }
     navigate(urlStr);
   };
 
@@ -158,7 +152,10 @@ const Header = () => {
       </div>
       <div className="flex w-full max-h-max lg:hidden justify-between py-6 px-6 items-center border-b backdrop-blur-md">
         <div className="max-w-max cursor-pointer">
-          <h1 className="text-2xl md:text-3xl tracking-tighter font-bold italic">
+          <h1
+            className="text-2xl md:text-3xl tracking-tighter font-bold italic"
+            onClick={() => handleRedirect("/")}
+          >
             <span className="text-blue-600">Flow</span>
             <span className="text-gray-600">Maker</span>
           </h1>

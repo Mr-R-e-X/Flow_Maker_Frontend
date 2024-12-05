@@ -1,63 +1,90 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { deleteSourceApi, removeFlow, templateApi } from "@/constants/config";
+import FlowList from "@/components/FlowList";
+import LeadSourceList from "@/components/LeadSourceList";
+import TemplateList from "@/components/TemplateList";
+import { getUserProfileApi } from "@/constants/config";
 import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 import { useToast } from "@/hooks/use-toast";
 import Layout from "@/Layouts/Layout";
-import { removeItemFromFlowList } from "@/store/slices/flowChartSlice";
-import { removeItemFromList } from "@/store/slices/listSlice";
-import { removeTemplate } from "@/store/slices/templateSlice";
+import { HomeShimmer } from "@/Layouts/Loaders";
+import { setProfile } from "@/store/slices/authSlice";
+import { setFlowList } from "@/store/slices/flowChartSlice";
+import { setList } from "@/store/slices/listSlice";
+import { setTemplateList } from "@/store/slices/templateSlice";
 import { ApiError, ApiResponse } from "@/types/responses";
+import { UnknownAction } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
-import { LoaderPinwheel, TrashIcon } from "lucide-react";
-import { useState } from "react";
+import { LoaderPinwheel } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-export function Home() {
+const Home = () => {
   const { flowList } = useAppSelector((state) => state.flow);
   const { templateList } = useAppSelector((state) => state.template);
   const { leadSourceList } = useAppSelector((state) => state.list);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const navigate = useNavigate();
+  const [isFetching, setIsFetching] = useState<boolean>(true);
   const dispatch = useAppDispatch();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
-  const handleFlowItemClick = (id: string) => {
-    navigate(`/flowchart/${id}`);
-  };
-
-  const handleLeadSourceRowClick = (id: string) => {
-    navigate(`/lead-sources/${id}`);
-  };
-  const handleTemplateRowClick = (id: string) => {
-    navigate(`/template-editor/${id}`);
-  };
-
-  const handleLeadSourceDelete = async (id: string) => {
-    try {
-      setIsLoading(true);
-      const response = await axios.delete<ApiResponse>(
-        `${deleteSourceApi}/${id}`,
-        {
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await axios.get<ApiResponse>(getUserProfileApi, {
           withCredentials: true,
-        }
-      );
-      dispatch(removeItemFromList(id));
+        });
+
+        const { user, flows, templates, leads } = response.data.data || {};
+        dispatch(setProfile(user));
+        dispatch(setFlowList(flows || []));
+        dispatch(setTemplateList(templates || []));
+        dispatch(setList(leads || []));
+
+        toast({
+          title: `Welcome ${user?.name || "User"}!`,
+          variant: "default",
+          duration: 3000,
+        });
+      } catch (error) {
+        const err = error as AxiosError<ApiError>;
+        toast({
+          title: err.response?.data.message || "Failed to load profile!",
+          variant: "destructive",
+          duration: 5000,
+        });
+      } finally {
+        setIsFetching(false);
+      }
+    };
+
+    fetchProfile();
+  }, [dispatch, toast]);
+
+  const handleRedirect = (urlStr: string) => {
+    navigate(urlStr);
+  };
+
+  const handleDelete = async (
+    url: string,
+    id: string,
+    valueSetter: (id: string) => UnknownAction
+  ) => {
+    try {
+      setIsLoading(true);
+      const response = await axios.delete<ApiResponse>(url, {
+        withCredentials: true,
+      });
       toast({
-        title: response.data.message || "Source deleted successfully",
+        title: response.data.message,
         variant: "default",
         duration: 5000,
       });
-    } catch (error: any) {
+      const action = valueSetter(id);
+      dispatch(action);
+    } catch (error) {
       const err = error as AxiosError<ApiError>;
       toast({
-        title: err.response?.data.message || "Something went wrong !!",
+        title: err.response?.data.message || "Something went wrong!",
         variant: "destructive",
         duration: 5000,
       });
@@ -66,53 +93,9 @@ export function Home() {
     }
   };
 
-  const handleDeleteFlow = async (id: string) => {
-    try {
-      setIsLoading(true);
-      const response = await axios.delete<ApiResponse>(`${removeFlow}/${id}`, {
-        withCredentials: true,
-      });
-      dispatch(removeItemFromFlowList(id));
-      toast({
-        title: response.data.message || "Flow deleted successfully",
-        variant: "default",
-        duration: 5000,
-      });
-    } catch (error) {
-      const err = error as AxiosError<ApiError>;
-      toast({
-        title: err.response?.data.message || "Something went wrong !!",
-        variant: "destructive",
-        duration: 5000,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDeleteTemplate = async (id: string) => {
-    try {
-      setIsLoading(true);
-      const response = await axios.delete<ApiResponse>(`${templateApi}/${id}`, {
-        withCredentials: true,
-      });
-      dispatch(removeTemplate(id));
-      toast({
-        title: response.data.message || "Template deleted successfully",
-        variant: "default",
-        duration: 5000,
-      });
-    } catch (error) {
-      const err = error as AxiosError<ApiError>;
-      toast({
-        title: err.response?.data.message || "Something went wrong !!",
-        variant: "destructive",
-        duration: 5000,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  if (isFetching) {
+    return <HomeShimmer />;
+  }
 
   return (
     <div className="h-[calc(100vh-6rem)] bg-gradient-to-b from-gray-900 to-black text-white p-8 flex flex-col items-center">
@@ -126,7 +109,6 @@ export function Home() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2  gap-8 w-full max-w-7xl">
-        {/* Saved Flows Section */}
         <div className="bg-gray-800 rounded shadow-lg p-8 flex flex-col">
           <h2 className="text-2xl font-semibold mb-6 text-center">
             Saved Flows
@@ -136,49 +118,11 @@ export function Home() {
               No Saved Flows Available!
             </p>
           ) : (
-            <div className="relative overflow-y-auto max-h-64">
-              <Table className="w-full text-sm">
-                <TableHeader className="sticky top-0 bg-gray-700">
-                  <TableRow>
-                    <TableCell className="font-bold text-gray-200 p-4 border-b border-gray-600">
-                      Title
-                    </TableCell>
-                    <TableCell className="font-bold text-gray-200 p-4 border-b border-gray-600">
-                      Description
-                    </TableCell>
-                    <TableCell className="font-bold text-gray-200 p-4 border-b border-gray-600">
-                      {/* <ActivityIcon /> */}
-                    </TableCell>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {flowList.map((flow) => (
-                    <TableRow
-                      key={flow._id}
-                      className="hover:bg-gray-700 transition-colors cursor-pointer relative"
-                      onClick={() => handleFlowItemClick(flow._id)}
-                    >
-                      <TableCell className="p-4 border-b border-gray-600">
-                        {flow.title}
-                      </TableCell>
-                      <TableCell className="p-4 border-b border-gray-600">
-                        {flow.description}
-                      </TableCell>
-                      <TableCell className="p-4 border-b border-gray-600"></TableCell>
-                      <TableCell className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                        <TrashIcon
-                          className="w-6 h-6 text-red-500 cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteFlow(flow._id);
-                          }}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+            <FlowList
+              flowList={flowList}
+              handleRedirect={handleRedirect}
+              handleDelete={handleDelete}
+            />
           )}
         </div>
 
@@ -191,49 +135,11 @@ export function Home() {
               No Saved Templates Available!
             </p>
           ) : (
-            <div className="relative overflow-y-auto max-h-64">
-              <Table className="w-full text-sm">
-                <TableHeader className="sticky top-0 bg-gray-700">
-                  <TableRow>
-                    <TableCell className="font-bold text-gray-200 p-4 border-b border-gray-600">
-                      Name
-                    </TableCell>
-                    <TableCell className="font-bold text-gray-200 p-4 border-b border-gray-600">
-                      Subject
-                    </TableCell>
-                    <TableCell className="font-bold text-gray-200 p-4 border-b border-gray-600"></TableCell>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {templateList.map((template) => (
-                    <TableRow
-                      key={template._id}
-                      className="hover:bg-gray-700 transition-colors cursor-pointer relative"
-                      onClick={() => handleTemplateRowClick(template._id)}
-                    >
-                      <TableCell className="p-4 border-b border-gray-600">
-                        {template.name}
-                      </TableCell>
-                      <TableCell className="p-4 border-b border-gray-600">
-                        {template.subject}
-                      </TableCell>
-                      <TableCell className="p-4 border-b border-gray-600">
-                        {/* Empty to reserve space */}
-                      </TableCell>
-                      <TableCell className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                        <TrashIcon
-                          className="w-6 h-6 text-red-500 cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleDeleteTemplate(template._id);
-                          }}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+            <TemplateList
+              templateList={templateList}
+              handleRedirect={handleRedirect}
+              handleDelete={handleDelete}
+            />
           )}
         </div>
 
@@ -246,50 +152,17 @@ export function Home() {
               No Saved Leads Available!
             </p>
           ) : (
-            <div className="relative overflow-y-auto max-h-64">
-              <Table className="w-full text-sm">
-                <TableHeader className="sticky top-0 bg-gray-700">
-                  <TableRow>
-                    <TableCell className="font-bold text-gray-200 p-4 border-b border-gray-600">
-                      Name
-                    </TableCell>
-
-                    <TableCell className="font-bold text-gray-200 p-4 border-b border-gray-600"></TableCell>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {leadSourceList.map((lead) => (
-                    <TableRow
-                      key={lead._id}
-                      className="hover:bg-gray-700 transition-colors cursor-pointer relative"
-                      onClick={() => handleLeadSourceRowClick(lead._id)}
-                    >
-                      <TableCell className="p-4 border-b border-gray-600">
-                        {lead.name}
-                      </TableCell>
-                      <TableCell className="p-4 border-b border-gray-600">
-                        {/* Empty to reserve space */}
-                      </TableCell>
-                      <TableCell className="absolute right-4 top-1/2 transform -translate-y-1/2">
-                        <TrashIcon
-                          className="w-6 h-6 text-red-500 cursor-pointer"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleLeadSourceDelete(lead._id);
-                          }}
-                        />
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
+            <LeadSourceList
+              leadSourceList={leadSourceList}
+              handleRedirect={handleRedirect}
+              handleDelete={handleDelete}
+            />
           )}
         </div>
       </div>
     </div>
   );
-}
+};
 
 const HomePage = Layout(Home, {
   title: "Home",

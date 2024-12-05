@@ -13,7 +13,6 @@ export const promptSequenceName = async () => {
       input: "text",
       inputPlaceholder: "Enter sequence name",
       showCancelButton: false,
-      allowOutsideClick: false,
       confirmButtonText: "Save",
       customClass: {
         popup:
@@ -111,7 +110,10 @@ export const handleLeadSourceAlert = async (leadSourceList: singeList[]) => {
         return null;
       }
 
-      return { value: selectElement.value, element: selectElement.innerText };
+      const selectedText =
+        selectElement.options[selectElement.selectedIndex].text;
+
+      return { value: selectElement.value, element: selectedText };
     },
   });
 
@@ -158,16 +160,15 @@ export const handleEmailSourceAlert = async (templateList: template[]) => {
       const selectElement = document.getElementById(
         "swal-select"
       ) as HTMLSelectElement;
-      const selectedValue = {
-        value: selectElement?.value,
-        element: selectElement.innerText,
-      };
 
-      if (!selectedValue) {
+      const selectedText =
+        selectElement.options[selectElement.selectedIndex].text;
+
+      if (!selectElement || !selectElement.value) {
         Swal.showValidationMessage("Please select a template.");
         return null;
       }
-      return selectedValue;
+      return { value: selectElement.value, element: selectedText };
     },
   });
   return value;
@@ -236,12 +237,8 @@ export const handleDelaySourceAlert = async () => {
   return value;
 };
 
-export const handleSaveSequence = async (name: string) => {
-  const {
-    value: formValues,
-    isConfirmed,
-    isDismissed,
-  } = await Swal.fire({
+export const handleSaveSequence = async () => {
+  const { value: formValues, isConfirmed } = await Swal.fire({
     title: '<span class="text-white">Save Sequence</span>',
     html: `
       <div class="flex flex-col gap-4">
@@ -251,7 +248,6 @@ export const handleSaveSequence = async (name: string) => {
             id="sequence-name"
             type="text"
             class="block w-full p-2 rounded-md bg-gray-800 text-white border border-gray-600 focus:ring focus:ring-blue-500"
-            value="${name}"
             placeholder="Enter a name for your sequence"
           />
         </div>
@@ -266,7 +262,6 @@ export const handleSaveSequence = async (name: string) => {
       </div>
     `,
     showCancelButton: true,
-    showDenyButton: false,
     confirmButtonText: "Save and Live",
     cancelButtonText: "Cancel",
     customClass: {
@@ -280,10 +275,10 @@ export const handleSaveSequence = async (name: string) => {
     preConfirm: () => {
       const nameInput = (
         document.getElementById("sequence-name") as HTMLInputElement
-      )?.value;
+      )?.value.trim();
       const descriptionInput = (
         document.getElementById("sequence-description") as HTMLTextAreaElement
-      )?.value;
+      )?.value.trim();
 
       if (!nameInput || !descriptionInput) {
         Swal.showValidationMessage("Please provide both name and description.");

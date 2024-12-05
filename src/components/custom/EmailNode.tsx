@@ -30,10 +30,10 @@ const EmailNode = ({
   const { templateList } = useAppSelector((state) => state.template);
 
   const handleEditTemplate = async () => {
-    const value = await handleEmailSourceAlert(templateList);
-    console.log(value);
+    const { value, element } = await handleEmailSourceAlert(templateList);
+
     if (value) {
-      setNodeTemplate(value.element);
+      setNodeTemplate(element);
       setNodes((prevNodes) =>
         prevNodes.map((node) => {
           if (node.id === id) {
@@ -41,7 +41,7 @@ const EmailNode = ({
               ...node,
               data: {
                 ...node.data,
-                source: value.value,
+                source: value,
               },
             };
             dispatch(setNodesData(node as CustomNode));
