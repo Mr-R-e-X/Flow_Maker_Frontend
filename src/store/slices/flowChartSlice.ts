@@ -150,6 +150,7 @@ export const {
   onEdgesChange,
   onConnect,
   setFlowList,
+  removeItemFromFlowList,
 } = flowChartSlice.actions;
 
 export default flowChartSlice.reducer;

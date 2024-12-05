@@ -38,9 +38,9 @@ const listSlice = createSlice({
       state.currentList = action.payload;
     },
     removeItemFromList: (state, action: PayloadAction<string>) => {
-      state.leadSourceList = state.leadSourceList.filter(
-        (item) => item._id !== action.payload
-      );
+      state.leadSourceList = state.leadSourceList.filter((item) => {
+        return item._id !== action.payload;
+      });
     },
   },
 });

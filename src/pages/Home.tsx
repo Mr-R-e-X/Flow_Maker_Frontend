@@ -6,11 +6,13 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { deleteSourceApi, removeFlow } from "@/constants/config";
+import { deleteSourceApi, removeFlow, templateApi } from "@/constants/config";
 import { useAppDispatch, useAppSelector } from "@/hooks/hooks";
 import { useToast } from "@/hooks/use-toast";
 import Layout from "@/Layouts/Layout";
+import { removeItemFromFlowList } from "@/store/slices/flowChartSlice";
 import { removeItemFromList } from "@/store/slices/listSlice";
+import { removeTemplate } from "@/store/slices/templateSlice";
 import { ApiError, ApiResponse } from "@/types/responses";
 import axios, { AxiosError } from "axios";
 import { LoaderPinwheel, TrashIcon } from "lucide-react";
@@ -70,7 +72,7 @@ export function Home() {
       const response = await axios.delete<ApiResponse>(`${removeFlow}/${id}`, {
         withCredentials: true,
       });
-      dispatch(removeItemFromList(id));
+      dispatch(removeItemFromFlowList(id));
       toast({
         title: response.data.message || "Flow deleted successfully",
         variant: "default",
@@ -88,8 +90,28 @@ export function Home() {
     }
   };
 
-  const handleDeleteTemplate = (id: string) => {
-    console.log(id);
+  const handleDeleteTemplate = async (id: string) => {
+    try {
+      setIsLoading(true);
+      const response = await axios.delete<ApiResponse>(`${templateApi}/${id}`, {
+        withCredentials: true,
+      });
+      dispatch(removeTemplate(id));
+      toast({
+        title: response.data.message || "Template deleted successfully",
+        variant: "default",
+        duration: 5000,
+      });
+    } catch (error) {
+      const err = error as AxiosError<ApiError>;
+      toast({
+        title: err.response?.data.message || "Something went wrong !!",
+        variant: "destructive",
+        duration: 5000,
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -232,9 +254,7 @@ export function Home() {
                       Name
                     </TableCell>
 
-                    <TableCell className="font-bold text-gray-200 p-4 border-b border-gray-600">
-                      {/* <ActivityIcon /> */}
-                    </TableCell>
+                    <TableCell className="font-bold text-gray-200 p-4 border-b border-gray-600"></TableCell>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
