@@ -13,7 +13,7 @@ import { setTemplateList } from "@/store/slices/templateSlice";
 import { ApiError, ApiResponse } from "@/types/responses";
 import { UnknownAction } from "@reduxjs/toolkit";
 import axios, { AxiosError } from "axios";
-import { LoaderPinwheel } from "lucide-react";
+import { FileText, Plus, Settings, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -21,7 +21,6 @@ const Home = () => {
   const { flowList } = useAppSelector((state) => state.flow);
   const { templateList } = useAppSelector((state) => state.template);
   const { leadSourceList } = useAppSelector((state) => state.list);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isFetching, setIsFetching] = useState<boolean>(true);
   const dispatch = useAppDispatch();
   const { toast } = useToast();
@@ -35,6 +34,7 @@ const Home = () => {
         });
 
         const { user, flows, templates, leads } = response.data.data || {};
+
         dispatch(setProfile(user));
         dispatch(setFlowList(flows || []));
         dispatch(setTemplateList(templates || []));
@@ -70,7 +70,6 @@ const Home = () => {
     valueSetter: (id: string) => UnknownAction
   ) => {
     try {
-      setIsLoading(true);
       const response = await axios.delete<ApiResponse>(url, {
         withCredentials: true,
       });
@@ -88,8 +87,6 @@ const Home = () => {
         variant: "destructive",
         duration: 5000,
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -99,24 +96,46 @@ const Home = () => {
 
   return (
     <div className="h-[calc(100vh-6rem)] bg-gradient-to-b from-gray-900 to-black text-white p-8 flex flex-col items-center">
-      <h1 className="text-4xl font-bold text-center mb-12">
-        Manage Sequences, Templates, and Sources
+      <h1 className="text-4xl py-2 font-bold text-center text-gradient bg-clip-text text-transparent bg-gradient-to-r from-green-400 via-blue-500 to-purple-500 mb-8">
+        Manage Your Workflow
       </h1>
-      {isLoading && (
-        <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-gray-900 bg-opacity-50 z-50">
-          <LoaderPinwheel className="animate-spin text-green-300" size={64} />
-        </div>
-      )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2  gap-8 w-full max-w-7xl">
-        <div className="bg-gray-800 rounded shadow-lg p-8 flex flex-col">
-          <h2 className="text-2xl font-semibold mb-6 text-center">
-            Saved Flows
-          </h2>
+      {/* Main Content */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 w-full max-w-7xl">
+        {/* Flows Section */}
+        <div className="bg-gray-800 rounded-lg shadow-lg p-8 flex flex-col space-y-4">
+          <div className="flex justify-between items-center mb-6 relative">
+            <h2 className="text-2xl font-semibold text-center text-green-400">
+              <FileText size={22} className="inline mr-2" />
+              Saved Flows
+            </h2>
+            {/* Add New Flow Button */}
+            {flowList.length > 0 && (
+              <button
+                onClick={() => handleRedirect("/flowchart")}
+                className=" p-3 bg-gradient-to-r from-green-500 to-teal-500 text-white font-semibold rounded-full shadow-md hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out"
+              >
+                <span className="flex items-center space-x-2">
+                  <Plus size={18} />
+                </span>
+              </button>
+            )}
+          </div>
           {flowList.length === 0 ? (
-            <p className="text-gray-400 italic text-center">
-              No Saved Flows Available!
-            </p>
+            <div className="text-center">
+              <p className="text-gray-400 italic mb-4">
+                No Saved Flows Available!
+              </p>
+              <button
+                onClick={() => handleRedirect("/flowchart")}
+                className="px-8 py-3 bg-gradient-to-r from-green-500 to-teal-500 text-white font-semibold rounded-full shadow-md hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out"
+              >
+                <span className="flex items-center space-x-2">
+                  <Plus size={18} />
+                  <span>Create New Flow</span>
+                </span>
+              </button>
+            </div>
           ) : (
             <FlowList
               flowList={flowList}
@@ -126,14 +145,38 @@ const Home = () => {
           )}
         </div>
 
-        <div className="bg-gray-800 rounded shadow-lg p-8 flex flex-col">
-          <h2 className="text-2xl font-semibold mb-6 text-center">
-            Saved Templates
-          </h2>
+        {/* Templates Section */}
+        <div className="bg-gray-800 rounded-lg shadow-lg p-8 flex flex-col space-y-4">
+          <div className="flex justify-between items-center mb-6 relative">
+            <h2 className="text-2xl font-semibold text-center text-blue-400 flex items-center">
+              <Settings size={22} className="inline mr-2" />
+              Saved Templates
+            </h2>
+            {/* Add New Template Button */}
+            <button
+              onClick={() => handleRedirect("/template-editor")}
+              className="p-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-full shadow-md hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out"
+            >
+              <span className="flex items-center space-x-2">
+                <Plus size={18} />
+              </span>
+            </button>
+          </div>
           {templateList.length === 0 ? (
-            <p className="text-gray-400 italic text-center">
-              No Saved Templates Available!
-            </p>
+            <div className="text-center">
+              <p className="text-gray-400 italic mb-4">
+                No Saved Templates Available!
+              </p>
+              <button
+                onClick={() => handleRedirect("/template-editor")}
+                className="px-8 py-3 bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-semibold rounded-full shadow-md hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out"
+              >
+                <span className="flex items-center space-x-2">
+                  <Plus size={18} />
+                  <span>Create New Template</span>
+                </span>
+              </button>
+            </div>
           ) : (
             <TemplateList
               templateList={templateList}
@@ -143,14 +186,38 @@ const Home = () => {
           )}
         </div>
 
-        <div className="bg-gray-800 rounded shadow-lg p-8 flex flex-col mb-6">
-          <h2 className="text-2xl font-semibold mb-6 text-center">
-            Saved Lead Sources
-          </h2>
+        {/* Lead Sources Section */}
+        <div className="bg-gray-800 rounded-lg shadow-lg p-8 flex flex-col space-y-4">
+          <div className="flex justify-between items-center mb-6 relative">
+            <h2 className="text-2xl flex items-center font-semibold text-center text-purple-400">
+              <Users size={22} className="inline mr-2" />
+              Saved Lead Sources
+            </h2>
+            {/* Add New Lead Source Button */}
+            <button
+              onClick={() => handleRedirect("/lead-sources")}
+              className="p-3 bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-semibold rounded-full shadow-md hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out"
+            >
+              <span className="flex items-center space-x-2">
+                <Plus size={18} />
+              </span>
+            </button>
+          </div>
           {leadSourceList.length === 0 ? (
-            <p className="text-gray-400 italic text-center">
-              No Saved Leads Available!
-            </p>
+            <div className="text-center">
+              <p className="text-gray-400 italic mb-4">
+                No Saved Lead Sources Available!
+              </p>
+              <button
+                onClick={() => handleRedirect("/create-lead-source")}
+                className="px-8 py-3 bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-semibold rounded-full shadow-md hover:scale-105 hover:shadow-xl transition-all duration-300 ease-in-out"
+              >
+                <span className="flex items-center space-x-2">
+                  <Plus size={18} />
+                  <span>Add New Lead Source</span>
+                </span>
+              </button>
+            </div>
           ) : (
             <LeadSourceList
               leadSourceList={leadSourceList}
