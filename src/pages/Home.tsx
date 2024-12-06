@@ -95,7 +95,7 @@ const Home = () => {
   }
 
   return (
-    <div className="h-[calc(100vh-6rem)] bg-gradient-to-b from-gray-900 to-black text-white p-8 flex flex-col items-center">
+    <div className="h-[calc(100vh-6rem)] bg-gradient-to-b from-gray-900 to-black text-white p-8 pt-0 flex flex-col items-center">
       <h1 className="text-4xl py-2 font-bold text-center text-gradient bg-clip-text text-transparent bg-gradient-to-r from-green-400 via-blue-500 to-purple-500 mb-8">
         Manage Your Workflow
       </h1>
