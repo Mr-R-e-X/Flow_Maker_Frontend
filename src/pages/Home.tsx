@@ -105,10 +105,10 @@ const Home = () => {
         {/* Flows Section */}
         <div className="bg-gray-800 rounded-lg shadow-lg p-8 flex flex-col space-y-4">
           <div className="flex justify-between items-center mb-6 relative">
-            <h2 className="text-2xl font-semibold text-center text-green-400">
+            <div className="text-2xl font-semibold text-center text-green-400 flex items-center">
               <FileText size={22} className="inline mr-2" />
               Saved Flows
-            </h2>
+            </div>
             {/* Add New Flow Button */}
             {flowList.length > 0 && (
               <button
@@ -148,10 +148,10 @@ const Home = () => {
         {/* Templates Section */}
         <div className="bg-gray-800 rounded-lg shadow-lg p-8 flex flex-col space-y-4">
           <div className="flex justify-between items-center mb-6 relative">
-            <h2 className="text-2xl font-semibold text-center text-blue-400 flex items-center">
+            <div className="text-2xl font-semibold text-center text-blue-400 flex items-center">
               <Settings size={22} className="inline mr-2" />
               Saved Templates
-            </h2>
+            </div>
             {/* Add New Template Button */}
             <button
               onClick={() => handleRedirect("/template-editor")}
@@ -189,10 +189,10 @@ const Home = () => {
         {/* Lead Sources Section */}
         <div className="bg-gray-800 rounded-lg shadow-lg p-8 flex flex-col space-y-4">
           <div className="flex justify-between items-center mb-6 relative">
-            <h2 className="text-2xl flex items-center font-semibold text-center text-purple-400">
+            <div className="text-2xl flex items-center font-semibold text-center text-purple-400">
               <Users size={22} className="inline mr-2" />
               Saved Lead Sources
-            </h2>
+            </div>
             {/* Add New Lead Source Button */}
             <button
               onClick={() => handleRedirect("/lead-sources")}
