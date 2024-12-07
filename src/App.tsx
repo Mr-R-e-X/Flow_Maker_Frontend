@@ -22,6 +22,7 @@ const TemplateEditor = lazy(() => import("./pages/TemplateEditor"));
 const CSVPage = lazy(() => import("./pages/CsvUpload"));
 const DataPreview = lazy(() => import("./pages/DataPreview"));
 const PreviewSeqPage = lazy(() => import("./pages/PreviewSeq"));
+const NotFoundPage = lazy(() => import("./pages/NotFound"));
 
 const App = () => {
   const { loader, userExists } = useAppSelector((state) => state.auth);
@@ -90,6 +91,7 @@ const App = () => {
             <Route path="/signup" element={<Signup />} />
             <Route path="/verify/:id" element={<Verify />} />
           </Route>
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
     </BrowserRouter>
